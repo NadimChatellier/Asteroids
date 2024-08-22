@@ -10,20 +10,32 @@ def main():
     clock = pygame.time.Clock()
     dt = 0
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    x = SCREEN_WIDTH / 2
-    y = SCREEN_HEIGHT / 2
-    P1 = Player(x, y)
+
+    # Create groups here
+    updatable = pygame.sprite.Group()
+    drawable = pygame.sprite.Group()
     
+    # Assign the newly created groups to Player.containers before instantiation
+    Player.containers = (updatable, drawable)
+    
+    # Now create the player instance
+    P1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+        
         screen.fill((0, 0, 0))
-        P1.draw(screen)
-        P1.update(dt)
+
+        # Iterate drawable and updatable groups to draw and update all sprites
+        for obj in drawable:
+            obj.draw(screen)
+        for obj in updatable:
+            obj.update(dt)
+
         pygame.display.flip()
-        dt = clock.tick(60)/1000
+        dt = clock.tick(60) / 1000
         
         
 
