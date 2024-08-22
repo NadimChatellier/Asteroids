@@ -1,53 +1,53 @@
-# this allows us to use code from
-# the open-source pygame library
-# throughout this file
+import sys
 import pygame
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from constants import *
 from player import Player
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 
+
 def main():
     pygame.init()
-    clock = pygame.time.Clock()
-    dt = 0
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    clock = pygame.time.Clock()
 
-    # Create groups here
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
-    
-    # Assign the newly created groups to Player.containers before instantiation
+    asteroids = pygame.sprite.Group()
+
+    Asteroid.containers = (asteroids, updatable, drawable)
+    AsteroidField.containers = updatable
+    asteroid_field = AsteroidField()
+
     Player.containers = (updatable, drawable)
 
-    Asteroid.containers = (updatable, drawable)
+    player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
-    AsteroidField.containers = (updatable)
+    dt = 0
 
-    
-    
-    
-    # Now create the player instance
-    P1 = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-    asteroid_field = AsteroidField()
-    
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-        
-        screen.fill((0, 0, 0))
 
-        # Iterate drawable and updatable groups to draw and update all sprites
-        for obj in drawable:
-            obj.draw(screen)
         for obj in updatable:
             obj.update(dt)
 
+        for asteroid in asteroids:
+            if asteroid.collides_with(player):
+                print("Game over!")
+                sys.exit()
+
+        screen.fill("black")
+
+        for obj in drawable:
+            obj.draw(screen)
+
         pygame.display.flip()
+
+        # limit the framerate to 60 FPS
         dt = clock.tick(60) / 1000
-        
-        
+
 
 if __name__ == "__main__":
     main()
